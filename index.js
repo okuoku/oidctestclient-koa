@@ -1,13 +1,14 @@
 const K = require("koa");
 const R = require("koa-router");
 const C = require("openid-client");
+const KoaError = require("koa-error");
 
 // Configs
 
 const hostname = process.env.PROJECT_DOMAIN ? process.env.PROJECT_DOMAIN + ".glitch.me" : "localhost";
 const proto = process.env.PROJECT_DOMAIN ? "https" : "http";
-const port = process.env.PORT ? process.env.PORT : 4000;
-const portstr = (proto == "https") ? "" : ":4000";
+const port = process.env.PORT ? process.env.PORT : 8080;
+const portstr = (proto == "https") ? "" : ":8080";
 
 const mycallback = proto + "://" + hostname + portstr + "/callback";
 const oidc_op = "https://oidcbadop.glitch.me/op/.well-known/openid-configuration";
@@ -46,8 +47,10 @@ function startup(oidc_client){
     router.get("/callback", res_callback(oidc_client));
 
     // app
+    app.use(KoaError({}));
     app.use(router.routes())
        .use(router.allowedMethods());
+
 
     app.listen(port);
 }
